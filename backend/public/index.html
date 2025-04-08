@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cross-Border Crypto Transactions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet" />
+    <script
+        src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
+    <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#000000"
+        data-border-radius="small"></script>
+</head>
+
+<body class="bg-gray-50 font-['Inter'] min-h-screen flex flex-col">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png"
+                            alt="Logo" />
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4"><button
+                        onclick="document.getElementById('userProfile').display = 'block'"
+                        class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 mr-4"><i
+                            class="fas fa-user-circle mr-2"></i><span id="username-display"></span></button>
+                    <div
+                        class="flex items-center bg-gradient-to-r from-indigo-50 to-blue-50 px-4 py-2 rounded-lg border border-indigo-100 hover:shadow-md transition-all duration-200">
+                        <span id="wallet-address-display" class="text-gray-500 ml-2 truncate"
+                            style="width: 150px;"></span>
+                    </div>
+
+                    <button id="connect-wallet-btn"
+                        class="!rounded-button bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 flex items-center font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg"><i
+                            class="fas fa-wallet mr-2"></i>Connect MetaMask</button>
+                    <button id="disconnect-wallet-btn" style="display: none;"
+                        class="!rounded-button bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 flex items-center font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg"><i
+                            class="fas fa-wallet mr-2"></i>Disconnect MetaMask</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-12 gap-8">
+            <div class="col-span-12 mb-8">
+                <div
+                    class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300 border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold">Your Balance</h2><button id="withdrawFundsBtnModal"
+                            class="!rounded-button bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 flex items-center font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg"><i
+                                class="fas fa-money-bill-transfer mr-2"></i>Withdraw Funds</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div
+                            class="bg-gradient-to-r from-green-200 to-emerald-200 p-6 rounded-xl border border-green-200">
+                            <span class="block text-sm text-gray-500 mb-2">Available Balance (<span
+                                    id="chosenCurrency"></span>)</span>
+                            <div class="flex items-center"></i><span class="text-2xl font-semibold"
+                                    id="converted-amount">0</span></div><span id="smallEth"
+                                class="text-gray-500 text-sm">2.5
+                                ETH</span>
+                        </div>
+                        <div class="bg-gradient-to-r from-indigo-200 to-blue-200 p-6 rounded-xl border border-blue-200">
+                            <span class="block text-sm text-gray-500 mb-2">ETH Equivalent</span>
+                            <div class="flex items-center"><span id="balance" class="text-2xl font-semibold">0</span>
+                            </div><span class="text-gray-500 text-sm" id="smallCur">$4,523.65</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-span-12">
+                <div id="initiate-transaction"
+                    class="bg-white rounded-xl shadow-lg p-6 mb-8 hover:shadow-xl transition duration-300 border border-gray-100">
+                    <h2 class="text-lg font-semibold mb-6">New Transaction</h2>
+                    <form id="initiate-transaction-form" class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Recipient Address</label>
+                            <input type="text" id="recipient" name="recipient"
+                                class="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200"
+                                placeholder="0x..." />
+                        </div>
+                        <div><label class="block text-sm font-medium text-gray-700">Amount</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="amountInChosenCurrency" name="amountInChosenCurrency"
+                                    class="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200"
+                                    placeholder="Enter amount" />
+                                <select id="amountIn"
+                                    class="mt-1 w-32 rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200">
+                                    <option value="USD">USD</option>
+                                    <option value="NGN" selected>NGN</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div
+                            class="col-span-2 bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-xl border border-indigo-100 hover:shadow-md transition-all duration-200">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <span class="block text-sm text-gray-500">You Send</span>
+                                    <span></span><span id="sentAmt" class="text-lg font-medium">0</span>
+                                </div>
+                                <div>
+                                    <span class="block text-sm text-gray-500">Recipient Gets</span>
+                                    <span>₦</span><span id="recipientAmt" class="text-lg font-medium">0</span>
+                                </div>
+                                <div>
+                                    <span class="block text-sm text-gray-500">ETH Equivalent</span>
+                                    <span id="amountInETH" class="text-lg font-medium" id="amountInETH">0</span> <span
+                                        class="text-lg font-medium">ETH</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-2">
+                            <button type="submit"
+                                class="!rounded-button w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg">
+                                Confirm Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div
+                    class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 border border-gray-100">
+                    <div class="p-6">
+                        <h2 class="text-lg font-semibold mb-6">Transaction History</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Date</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Type</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Amount</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-02-20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Send</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">0.5 ETH ($905.25)
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Completed
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <button
+                                                class="text-custom hover:text-custom-dark p-2 hover:bg-gray-100 rounded-full transition-all duration-200">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-02-19</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Receive</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1.2 ETH
+                                            ($2,172.60)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Completed
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <button
+                                                class="text-custom hover:text-custom-dark p-2 hover:bg-gray-100 rounded-full transition-all duration-200">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-8">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                © 2024 Cross-Border Crypto Transactions. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+
+
+
+    <div id="userProfile" style="display: none;"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 max-w-md">
+            <div class="bg-white rounded-xl shadow-2xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Profile Information</h2><button
+                        onclick="document.getElementById('userProfile').display = 'none'"
+                        class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="profile-form-container">
+                    <form id="register-user-form" class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700">Username</label><input type="text"
+                                id="username" name="username"
+                                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                                placeholder="Enter username" /></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Full Name</label><input type="text"
+                                id="fullName" name="fullName"
+                                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                                placeholder="Enter full name" /></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Email Address</label><input
+                                id="emailAddress" name="emailAddress" type="email"
+                                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                                placeholder="Enter email" /></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Bank Details</label><textarea
+                                id="withdrawalBankDetails" name="withdrawalBankDetails"
+                                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                                rows="3" placeholder="Enter bank details"></textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Preferred Currency</label><select
+                                id="currency" name="currency"
+                                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                                <option value="USD">USD</option>
+                                <option value="NGN">NGN</option>
+                            </select></div><button id="register-user-button"
+                            class="!rounded-button w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-4 font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg">Save
+                            Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="transfer-success-modal" style="display: none;"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 max-w-md">
+            <div class="bg-white rounded-xl shadow-2xl p-6">
+                <div class="flex flex-col items-center text-center">
+                    <div class="mb-4"><i class="fas fa-check-circle text-5xl text-green-500"></i></div>
+                    <h2 class="text-2xl font-semibold mb-2">Transaction Successful!</h2>
+                    <p class="text-gray-600 mb-6">Your transaction has been processed successfully and is now being
+                        confirmed on the blockchain.</p>
+                    <div class="bg-gray-50 w-full p-4 rounded-lg mb-6">
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Amount Sent:</span><span
+                                id="transferSent" class="font-medium"></span></div>
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Recipient Gets:</span><span
+                                id="transferGets" class="font-medium">€920.45 EUR</span></div>
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Transaction Hash:</span><span
+                                class="font-medium text-sm">0x1234...5678</span></div>
+                        <div class="flex justify-between"><span class="text-gray-600">Status:</span><span
+                                class="font-medium text-green-600">Processing</span></div>
+                    </div>
+                    <button id="closeTransferModal"
+                        class="!rounded-button w-full bg-gray-600 hover:bg-gray-700 text-white py-2.5 px-4 font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="withdraw-modal" style="display: none;"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 max-w-md">
+            <div class="bg-white rounded-xl shadow-2xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Withdraw Funds</h2><button
+                        onclick="document.getElementById('withdraw-modal').style.display = 'none'"
+                        class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-medium text-gray-700">Amount to Withdraw in ETH</label><input id="withdraw-amount-input"
+                            type="number"
+                            class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                            placeholder="Enter ETH amount" /></div>
+                    <div><label class="block text-sm font-medium text-gray-700">Withdrawal Method</label><select
+                            class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                            <option>Email Simulation</option>
+                        </select></div>
+                    <div><label class="block text-sm font-medium text-gray-700">Destination (Enter Email Address)</label><input type="text" id="email-address-input"
+                            class="mt-1 block w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                            placeholder="Enter email address" /></div>
+                            <button id="withdraw-button"
+                        class="!rounded-button w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg mt-4"
+                        >Place
+                        Withdrawal</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdraw-success-modal" style="display: none;" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 max-w-md">
+            <div class="bg-white rounded-xl shadow-2xl p-6">
+                <div class="flex flex-col items-center text-center">
+                    <div class="mb-4"><i class="fas fa-check-circle text-5xl text-green-500"></i></div>
+                    <h2 class="text-2xl font-semibold mb-2">Withdrawal Successful!</h2>
+                    <p class="text-gray-600 mb-6">Your withdrawal request has been processed successfully. Your receipt has been sent to your email.</p>
+                    <button id="closeWithdraw"
+                        class="!rounded-button w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdraw-canceled-modal" style="display: none;"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 max-w-md">
+            <div class="bg-white rounded-xl shadow-2xl p-6">
+                <div class="flex flex-col items-center text-center">
+                    <div class="mb-4"><i class="fas fa-times-circle text-5xl text-red-500"></i></div>
+                    <h2 class="text-2xl font-semibold mb-2">Withdrawal Canceled</h2>
+                    <p class="text-gray-600 mb-6">Your withdrawal request has been canceled. No funds have been
+                        transferred.</p>
+                    <div class="bg-gray-50 w-full p-4 rounded-lg mb-6">
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Status:</span><span
+                                class="font-medium text-red-600">Canceled</span></div>
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Time:</span><span
+                                class="font-medium">Just now</span></div>
+                    </div><button id="closeWithdrawalCancel"
+                        class="!rounded-button w-full bg-gray-600 hover:bg-gray-700 text-white py-2.5 px-4 font-medium transition duration-150 ease-in-out shadow-md hover:shadow-lg">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const connectWalletBtn = document.getElementById('connect-wallet-btn');
+            const disconnectWalletBtn = document.getElementById('disconnect-wallet-btn');
+            const registerUserForm = document.getElementById('register-user-form');
+            const initiateTransactionForm = document.getElementById('initiate-transaction-form');
+            const usernameDisplay = document.getElementById('username-display');
+            const chosenCurrencyDisplay = document.getElementById('chosenCurrency');
+            const userProfile = document.getElementById('userProfile');
+            const walletAddressDisplay = document.getElementById('wallet-address-display');
+            const amountInChosenCurrency = document.getElementById('amountInChosenCurrency');
+            const amount = document.getElementById('amountInETH');
+            const sentAmt = document.getElementById('sentAmt');
+            const recipientAmt = document.getElementById('recipientAmt');
+            const amountIn = document.getElementById('amountIn');
+            const withdrawFundsBtnModal = document.getElementById('withdrawFundsBtnModal');
+            const withdrawModal = document.getElementById('withdraw-modal');
+            const transferSuccessModal = document.getElementById('transfer-success-modal');
+            const closeTransferModal = document.getElementById('closeTransferModal');
+            const transferSent = document.getElementById('transferSent');
+            const transferGets = document.getElementById('transferGets');
+            const withdrawSuccessModal = document.getElementById('withdraw-success-modal');
+            const closeWithdraw = document.getElementById('closeWithdraw');
+            const closeWithdrawalCancel = document.getElementById('closeWithdrawalCancel');
+            const withdrawCanceledModal = document.getElementById('withdraw-canceled-modal');
+
+
+            // Retrieve the token from local storage and use it to fetch the user data
+            const token = localStorage.getItem('token');
+
+            const web3 = new Web3(window.ethereum);
+            if (typeof window.ethereum !== 'undefined') {
+                console.log('MetaMask is installed!');
+
+                connectWalletBtn.addEventListener('click', async () => {
+                    if (window.ethereum) {
+                        const accounts = await window.ethereum.request({
+                            method: 'eth_requestAccounts',
+                        });
+                        walletAddress = accounts[0];
+                        localStorage.setItem('token', walletAddress);
+                        window.location.reload();
+                    } else {
+                        alert('No Ethereum provider found');
+                    }
+                });
+
+                disconnectWalletBtn.addEventListener('click', async () => {
+                    localStorage.removeItem('token');
+                    window.location.reload();
+                });
+
+                registerUserForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const fullName = document.getElementById('fullName').value;
+                    const withdrawalBankDetails = document.getElementById('withdrawalBankDetails').value;
+                    const emailAddress = document.getElementById('emailAddress').value;
+                    const currency = document.getElementById('currency').value;
+                    if (username == "") {
+                        alert("Input Username")
+                    } else if (token == "") {
+                        alert("Connect wallet address")
+                    } else {
+
+                        try {
+                            const response = await fetch('/register-user', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ username, fullName, withdrawalBankDetails, emailAddress, currency, walletAddress: token }),
+                            });
+                            const { tx } = await response.json();
+                            const txObject = {
+                                from: tx.from,
+                                to: tx.to,
+                                nonce: tx.nonce,
+                                gasPrice: tx.gasPrice,
+                                gas: tx.gas,
+                                data: tx.data,
+                            };
+                            // Sign the transaction using MetaMask
+                            const signedTx = await ethereum.request({
+                                method: "eth_sendTransaction",
+                                params: [txObject],
+                            });
+                            console.log("Transaction sent:", signedTx);
+                            window.location.reload();
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+
+                });
+
+                if (token) {
+                    fetch(`/user-profile?walletAddress=${token}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // console.log("username", data.username)
+                            if (!data.username) {
+                                console.log("Username", data.username)
+                                userProfile.style.display = "block";
+                            } else {
+                                usernameDisplay.textContent = `${data.username}`;
+                                chosenCurrencyDisplay.textContent = `${data.chosenCurrency}`;
+                                // usernameDisplay.textContent = `${data.username}, ${data.fullName}, ${data.withdrawalBankDetails}, ${data.emailAddress}, ${data.chosenCurrency}`;
+                                walletAddressDisplay.textContent = `${token}`;
+                                disconnectWalletBtn.style.display = "block";
+                                connectWalletBtn.style.display = "none";
+
+                                const chosenCurrency = data.chosenCurrency;
+
+                                let ethBalance;
+                                let currencySymbol;
+
+
+                                fetch('/user-balance/' + token)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const balance = parseFloat(data.ethBalance);
+                                        ethBalance = data.ethBalance
+                                        document.getElementById('balance').innerText = Math.floor(balance) + '.' + Math.floor((balance - Math.floor(balance)) * 1000) + ' ETH';
+                                        const smallEth = document.getElementById('smallEth');
+                                        smallEth.innerText = document.getElementById('balance').innerText;
+                                    })
+                                    .catch(error => console.error('Error:', error))
+                                    .then(() => {
+                                        fetch('/convert-currency', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ fromCurrency: 'ETH', toCurrency: chosenCurrency, amount: ethBalance, address: token }),
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+
+                                                function addCommas(n) {
+                                                    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                }
+                                                if (chosenCurrency === 'NGN') {
+                                                    currencySymbol = '₦';
+                                                } else if (chosenCurrency === 'USD') {
+                                                    currencySymbol = '$';
+                                                }
+
+
+                                                document.getElementById('converted-amount').innerText = `${currencySymbol}${addCommas(parseFloat(data.convertedAmountValue).toFixed(2))}`;
+                                                const smallCur = document.getElementById('smallCur');
+                                                smallCur.innerText = document.getElementById('converted-amount').innerText;
+                                                sentAmt.previousElementSibling.innerText = currencySymbol;
+                                            })
+
+                                    });
+
+
+                                amountIn.addEventListener('change', async () => {
+                                    await convertCurrency();
+                                    if (amountIn.value === 'NGN') {
+                                        currencySymb = '₦';
+                                    } else if (amountIn.value === 'USD') {
+                                        currencySymb = '$';
+                                    }
+                                    recipientAmt.previousElementSibling.innerText = currencySymb;
+                                });
+
+                                amountInChosenCurrency.addEventListener('input', async () => {
+                                    await convertCurrency();
+                                });
+
+                                async function convertCurrency() {
+                                    const amountCurrency = amountInChosenCurrency.value;
+                                    if (amountCurrency === '') return;
+
+                                    try {
+                                        const response = await fetch('/convert-currency', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ fromCurrency: amountIn.value, toCurrency: 'ETH', amount: amountCurrency, address: token }),
+                                        });
+                                        const data = await response.json();
+                                        amount.innerText = `${data.convertedAmountValue}`;
+
+                                        const response1 = await fetch('/convert-currency', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ fromCurrency: 'ETH', toCurrency: chosenCurrency, amount: amount.innerText, address: token }),
+                                        });
+                                        const data1 = await response1.json();
+
+                                        sentAmt.innerText = `${data1.convertedAmountValue}`;
+                                        recipientAmt.innerText = amountCurrency;
+                                    } catch (error) {
+                                        console.error(error);
+                                    }
+                                }
+
+                            }
+                        })
+                        .catch(error => console.error(error));
+                }
+
+                initiateTransactionForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const recipient = document.getElementById('recipient').value;
+
+                    console.log(amount)
+
+                    const amountInETH = "0x" + Web3.utils.toBN(Web3.utils.toWei(amount.innerText.toString(), "ether")).toString(16);
+
+                    console.log(recipient, amount, amountInETH)
+                    try {
+                        const response = await fetch('/initiate-transaction', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ recipient, amountInETH, amount: amount.innerText.toString(), walletAddress: token }),
+                        });
+                        const { tx } = await response.json();
+                        const txObject = {
+                            from: tx.from,
+                            to: tx.to,
+                            nonce: tx.nonce,
+                            gasPrice: tx.gasPrice,
+                            gas: tx.gas,
+                            value: tx.value, // Add this line
+                            data: tx.data,
+                        };
+                        // Sign the transaction using MetaMask
+                        const signedTx = await ethereum.request({ method: "eth_sendTransaction", params: [txObject], });
+                        console.log("Transaction sent:", signedTx);
+                        transferSuccessModal.style.display = "block"
+                        transferSent.innerText = `${sentAmt.previousElementSibling.innerText}${sentAmt.innerText}`;
+                        transferGets.innerText = `${recipientAmt.previousElementSibling.innerText}${recipientAmt.innerText}`;
+                    } catch (error) {
+                        console.error(error);
+                    }
+                });
+
+                closeTransferModal.addEventListener("click", () => {
+                    transferSuccessModal.style.display = "none";
+                    window.location.reload();
+                })
+
+                withdrawFundsBtnModal.addEventListener("click", () => {
+                    withdrawModal.style.display = "block"
+                })
+                closeWithdraw.addEventListener("click", () => {
+                    withdrawSuccessModal.style.display = "none"
+                    window.location.reload()
+                })
+                closeWithdrawalCancel.addEventListener("click", () => {
+                    withdrawCanceledModal.style.display = "none"
+                    window.location.reload()
+                })
+
+                document.getElementById("withdraw-button").addEventListener("click", async () => {
+                    const amount = document.getElementById("withdraw-amount-input").value;
+                    const amountCv = "0x" + Web3.utils.toBN(Web3.utils.toWei(amount, "ether")).toString(16);
+                    const emailAddress = document.getElementById("email-address-input").value;
+                    try {
+                        const response = await fetch("/withdraw-funds", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ amount: amountCv, amountPlain: amount, walletAddress: token }),
+                        });
+                        const { tx } = await response.json();
+                        const txObject = {
+                            from: tx.from,
+                            to: tx.to,
+                            nonce: tx.nonce,
+                            gasPrice: tx.gasPrice,
+                            gas: tx.gas,
+                            value: tx.value, // Add this line
+                            data: tx.data,
+                        };
+                        // Sign the transaction using MetaMask
+                        const signedTx = await ethereum.request({ method: "eth_sendTransaction", params: [txObject], });
+                        // console.log("Transaction sent:", signedTx);
+                        withdrawSuccessModal.style.display = "block"
+                    } catch (error) {
+                        console.error(error);
+                        withdrawCanceledModal.style.display = "block"
+                    }
+                });
+
+            } else {
+                alert('MetaMask is not installed. Please install it to use this application.');
+                connectWalletBtn.innerHTML = `<a target="_blank" href="https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=www.google.com">Download Metamask</a>`
+            }
+        });
+    </script>
+
+</body>
+
+</html>
