@@ -169,7 +169,7 @@ app.post("/withdraw-funds", async (req, res) => {
         to: "chinomsochristian03@gmail.com",
         from: "chinomsochristian03@gmail.com",
         subject: "Cross Border App💸💰 - Withdrawal to Bank Successful",
-        text: `You have Successful withdrawn ${amountPlain} ETH from the cross border app into your bank account🤩 \nFeel free to make transaction with out cross-border app and be rest assured your money is safe👌 \n \n \nPlease rate us.😁`,
+        text: `You have Successfully withdrawn ${amountPlain} ETH from the cross border app into your bank account🤩 \nFeel free to make transaction with our cross-border app and be rest assured your money is safe👌 \n \n \nPlease rate us.😁`,
       };
 
       await transporter.sendMail(mailOptions);
