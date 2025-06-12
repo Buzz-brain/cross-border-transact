@@ -1,4 +1,4 @@
-# 🌍 Cross-Border-Transact Web App (Blockchain-Based Money Transfer)
+ 🌍 Cross-Border-Transact Web App (Blockchain-Based Money Transfer)
 
 This is a decentralized cross-border web application that allows users from different countries to send and receive money in their preferred currencies (USD, NGN), using **Ethereum (ETH)** as the base currency. It leverages **blockchain technology** for transparency, immutability, and secure financial transactions.
 
